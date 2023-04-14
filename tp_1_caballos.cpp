@@ -166,7 +166,11 @@ float caballoCrono() {
     float tiempo_total = 0.f;
     while (true) {
         tiempo_total += flotanteAleatorio(0.1f, 3.5f);
+        if (flotanteAleatorio(0.f, 100.f) < 0.05f) {
+            break;
+        }
     }
+    return tiempo_total;
 }
 
 int main() {
