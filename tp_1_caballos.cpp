@@ -15,6 +15,14 @@ enum tipos_disponibles {
     CRONO //6
 };
 
+int enteroAleatorio(const int &minimo, const int &maximo) {
+    return rand() % maximo + minimo;
+}
+
+float flotanteAleatorio(const float &minimo, const float &maximo) {
+    return (float)rand() / (float)RAND_MAX * (maximo-minimo) + minimo;
+}
+
 void obtenerCantidadCaballos(int &cantidad_caballos) {
     std::cout << "Ingrese la cantidad de caballos: "; std::cin >> cantidad_caballos;
 }
@@ -53,13 +61,58 @@ void reiniciarRandomSeed() {
     srand(time(NULL));
 }
 
+float calcularTiempo(const int &tipo) {
+    float arreglo_pipe[2];
+    if (pipe(arreglo_pipe) == -1) {
+        throw Exception("Error al ejecutar la función pipe()");
+    }
+
+    int pid = fork();
+    if (pid == -1) {
+        throw Exception("Error al ejecutar la función fork()");
+    }
+    
+    if (pid == 0) {
+        float tiempo;
+        switch (tipo) {
+            case tipos_disponibles::CUARTO_DE_MILLA:
+                tiempo = caballoCuartoDeMilla();
+                break;
+            case tipos_disponibles::RAYO:
+                tiempo = caballoRayo();
+                break;
+            case tipos_disponibles::LINEAL:
+                tiempo = caballoLineal();
+                break;
+            case tipos_disponibles::EXPONENCIAL:
+                tiempo = caballoExponencial();
+                break;
+            case tipos_disponibles::DUOBALLO:
+                tiempo = caballoDuoballo();
+                break;
+            case tipos_disponibles::CRONO:
+                tiempo = caballoCrono();
+                break;
+        }
+        write(arreglo_pipe[1], &tiempo, sizeof(float));
+        close(arreglo_pipe[1]);
+        exit(0);
+    }
+
+    wait(NULL);
+
+    float *tiempo;
+    read(arreglo_pipe[0], tiempo, sizeof(float));
+    return *tiempo;
+}
+
 float caballoCuartoDeMilla() {
     float tiempo_total = 0.f;
     while (true) {
-        if ((rand() % 100 + 1) <= 5) {
+        tiempo_total += 2.f;
+        if (enteroAleatorio(1, 100) <= 5) {
             break;
         }
-        tiempo_total += 2.f;
     }
     return tiempo_total;
 }
@@ -67,10 +120,10 @@ float caballoCuartoDeMilla() {
 float caballoRayo() {
     float tiempo_total = 0.f;
     while (true) {
-        if ((rand() % 100 + 1) <= 3) {
+        tiempo_total += 1.f;
+        if (enteroAleatorio(1, 100) <= 3) {
             break;
         }
-        tiempo_total += 1.f;
     }
     return tiempo_total;
 }
@@ -79,10 +132,10 @@ float caballoLineal() {
     float tiempo_total = 0.f;
     int iteraciones = 1;
     while (true) {
-        if ((rand() % 100 + 1) <= 2*iteraciones) {
+        tiempo_total += 3;
+        if (enteroAleatorio(1, 100) <= 2*iteraciones) {
             break;
         }
-        tiempo_total += 3;
         iteraciones++;
     }
     return tiempo_total;
@@ -92,16 +145,33 @@ float caballoExponencial() {
     float tiempo_total = 0.f;
     int iteraciones = 1;
     while (true) {
-        if ((rand() % 100 + 1) <= (1 - pow(0.98, iteraciones)) * 100) {
+        tiempo_total += 0.5f;
+        if (enteroAleatorio(1, 100) <= (1 - pow(0.98, iteraciones)) * 100) {
             break;
         }
-        tiempo_total += 0.5f;
         iteraciones++;
     }
     return tiempo_total;
 }
 
+float caballoDuoballo() {
+    if (*(to_string(getppid()).back()) > '5') {
+        return caballoLineal();
+    } else {
+        return caballoExponencial();
+    }
+}
+
+float caballoCrono() {
+    float tiempo_total = 0.f;
+    while (true) {
+        tiempo_total += flotanteAleatorio(0.1f, 3.5f);
+    }
+}
+
 int main() {
+    // TODO Abarcar varias carreras
+
     /*** Tomar entrada del usuario ***/
     // Cantidad de caballos
     int cantidad_caballos;
@@ -111,8 +181,14 @@ int main() {
     std::vector<std::string> nombres_ingresados(cantidad_caballos);
     obtenerCaballos(cantidad_caballos, tipos_ingresados, nombres_ingresados);
 
+    // waitpid()
+
     /*** Calcular tiempos ***/
-    reiniciarRandomSeed();
+    std::vector<float> tiempo(cantidad_caballos);
+    for (int i = 0; i < cantidad_caballos; i++) {
+        reiniciarRandomSeed();
+        tiempo[i] = calcularTiempo(tipos_ingresados[i]);
+    }
 
     /*** Mostrar resultados ***/
 
