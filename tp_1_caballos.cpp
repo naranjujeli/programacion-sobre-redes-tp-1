@@ -6,6 +6,60 @@
 #include <sys/wait.h>
 #include <math.h>
 
+int enteroAleatorio(const int &, const int &);
+float flotanteAleatorio(const float &, const float &);
+void obtenerCantidadCaballos(int &);
+void mostrarTipos();
+void obtenerTipo(int &);
+void obtenerNombre(std::string &);
+void obtenerCaballos(const int &, std::vector<int> &, std::vector<std::string> &);
+void reiniciarRandomSeed();
+int redondearHaciaArriba(const float &);
+int calcularTiempo(const int &, const std::string &);
+int caballoCuartoDeMilla();
+int caballoRayo();
+int caballoLineal();
+int caballoExponencial();
+int caballoDuoballo();
+int caballoCrono();
+
+int main() {
+    // TODO Abarcar varias carreras
+
+    /*** Tomar entrada del usuario ***/
+    // Cantidad de caballos
+    int cantidad_caballos;
+    obtenerCantidadCaballos(cantidad_caballos);
+    // Tipo y nombre
+    std::vector<int> tipos_ingresados(cantidad_caballos);
+    std::vector<std::string> nombres_ingresados(cantidad_caballos);
+    obtenerCaballos(cantidad_caballos, tipos_ingresados, nombres_ingresados);
+
+    // waitpid()
+
+    /*** Calcular tiempos ***/
+    std::vector<float> tiempo(cantidad_caballos);
+    for (int i = 0; i < cantidad_caballos; i++) {
+        reiniciarRandomSeed();
+        tiempo[i] = calcularTiempo(tipos_ingresados[i], nombres_ingresados[i]);
+    }
+
+    /*** Mostrar resultados ***/
+
+    /*** Guardar datos ***/
+
+
+    // Debugging
+    /* 
+    std::cout << "Caballo cuarto de milla: " << caballoCuartoDeMilla() << std::endl;
+    std::cout << "Caballo rayo: " << caballoRayo() << std::endl;
+    std::cout << "Caballo lineal: " << caballoLineal() << std::endl;
+    std::cout << "Caballo exponencial: " << caballoExponencial() << std::endl;
+    */
+
+    return 0;
+}
+
 enum tipos_disponibles {
     CUARTO_DE_MILLA=1,
     RAYO,
@@ -61,19 +115,23 @@ void reiniciarRandomSeed() {
     srand(time(NULL));
 }
 
-float calcularTiempo(const int &tipo) {
-    float arreglo_pipe[2];
+int redondearHaciaArriba(const float &valor_flotante) {
+    return std::ceil(valor_flotante);
+}
+
+int calcularTiempo(const int &tipo, const std::string &nombre) {
+    int arreglo_pipe[2];
     if (pipe(arreglo_pipe) == -1) {
-        throw Exception("Error al ejecutar la función pipe()");
+        throw "Error al ejecutar la función pipe()";
     }
 
     int pid = fork();
     if (pid == -1) {
-        throw Exception("Error al ejecutar la función fork()");
+        throw "Error al ejecutar la función fork()";
     }
     
     if (pid == 0) {
-        float tiempo;
+        int tiempo;
         switch (tipo) {
             case tipos_disponibles::CUARTO_DE_MILLA:
                 tiempo = caballoCuartoDeMilla();
@@ -94,22 +152,25 @@ float calcularTiempo(const int &tipo) {
                 tiempo = caballoCrono();
                 break;
         }
-        write(arreglo_pipe[1], &tiempo, sizeof(float));
+
+        write(arreglo_pipe[1], &tiempo, sizeof(int));
         close(arreglo_pipe[1]);
+
+        std::cout << nombre << " >> Terminé en " << tiempo << " segundos" << std::endl;
         exit(0);
     }
 
     wait(NULL);
 
-    float *tiempo;
-    read(arreglo_pipe[0], tiempo, sizeof(float));
+    int *tiempo;
+    read(arreglo_pipe[0], tiempo, sizeof(int));
     return *tiempo;
 }
 
-float caballoCuartoDeMilla() {
-    float tiempo_total = 0.f;
+int caballoCuartoDeMilla() {
+    int tiempo_total = 0;
     while (true) {
-        tiempo_total += 2.f;
+        tiempo_total += 2;
         if (enteroAleatorio(1, 100) <= 5) {
             break;
         }
@@ -117,10 +178,10 @@ float caballoCuartoDeMilla() {
     return tiempo_total;
 }
 
-float caballoRayo() {
-    float tiempo_total = 0.f;
+int caballoRayo() {
+    int tiempo_total = 0;
     while (true) {
-        tiempo_total += 1.f;
+        tiempo_total += 1;
         if (enteroAleatorio(1, 100) <= 3) {
             break;
         }
@@ -128,8 +189,8 @@ float caballoRayo() {
     return tiempo_total;
 }
 
-float caballoLineal() {
-    float tiempo_total = 0.f;
+int caballoLineal() {
+    int tiempo_total = 0;
     int iteraciones = 1;
     while (true) {
         tiempo_total += 3;
@@ -141,7 +202,7 @@ float caballoLineal() {
     return tiempo_total;
 }
 
-float caballoExponencial() {
+int caballoExponencial() {
     float tiempo_total = 0.f;
     int iteraciones = 1;
     while (true) {
@@ -151,18 +212,17 @@ float caballoExponencial() {
         }
         iteraciones++;
     }
-    return tiempo_total;
+    return redondearHaciaArriba(tiempo_total);
 }
 
-float caballoDuoballo() {
-    if (*(to_string(getppid()).back()) > '5') {
+int caballoDuoballo() {
+    if (std::to_string(getppid()).back() > '5') {
         return caballoLineal();
-    } else {
-        return caballoExponencial();
     }
+    return caballoExponencial();
 }
 
-float caballoCrono() {
+int caballoCrono() {
     float tiempo_total = 0.f;
     while (true) {
         tiempo_total += flotanteAleatorio(0.1f, 3.5f);
@@ -170,42 +230,5 @@ float caballoCrono() {
             break;
         }
     }
-    return tiempo_total;
-}
-
-int main() {
-    // TODO Abarcar varias carreras
-
-    /*** Tomar entrada del usuario ***/
-    // Cantidad de caballos
-    int cantidad_caballos;
-    obtenerCantidadCaballos(cantidad_caballos);
-    // Tipo y nombre
-    std::vector<int> tipos_ingresados(cantidad_caballos);
-    std::vector<std::string> nombres_ingresados(cantidad_caballos);
-    obtenerCaballos(cantidad_caballos, tipos_ingresados, nombres_ingresados);
-
-    // waitpid()
-
-    /*** Calcular tiempos ***/
-    std::vector<float> tiempo(cantidad_caballos);
-    for (int i = 0; i < cantidad_caballos; i++) {
-        reiniciarRandomSeed();
-        tiempo[i] = calcularTiempo(tipos_ingresados[i]);
-    }
-
-    /*** Mostrar resultados ***/
-
-    /*** Guardar datos */
-
-
-    // Debugging
-    /* 
-    std::cout << "Caballo cuarto de milla: " << caballoCuartoDeMilla() << std::endl;
-    std::cout << "Caballo rayo: " << caballoRayo() << std::endl;
-    std::cout << "Caballo lineal: " << caballoLineal() << std::endl;
-    std::cout << "Caballo exponencial: " << caballoExponencial() << std::endl;
-    */
-
-    return 0;
+    return redondearHaciaArriba(tiempo_total);
 }
