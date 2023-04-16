@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "utilidades_matematicas.h"
+#include "Caballo.h"
 #include "caballos.h"
 
 int caballoCuartoDeMilla() {

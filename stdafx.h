@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <random>
+#include <algorithm>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <math.h>

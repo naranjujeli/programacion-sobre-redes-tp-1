@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "tipos_disponibles.h"
+#include "Caballo.h"
 #include "entrada_salida.h"
 
 void obtenerCantidadCaballos(int &cantidad_caballos) {
@@ -18,24 +19,40 @@ void mostrarTipos() {
     std::cout << tipos_disponibles::CRONO << ". Crono" << std::endl;
 }
 
-// TODO validar que sea un numero
 void obtenerTipo(int &tipo) {
     mostrarTipos();
-    do {
-        std::cout << "Ingrese tipo (número correspondiente): "; std::cin >> tipo;
-    } while (tipo < tipos_disponibles::CUARTO_DE_MILLA || tipo > tipos_disponibles::CRONO);
+    int numero_ingresado;
+    while (true) {
+        std::cout << "Ingrese tipo (número correspondiente): ";
+        if (!(std::cin >> numero_ingresado)) {
+            std::cout << "ERROR: Ingresa un número" << std::endl;
+            continue;
+        }
+        if (numero_ingresado < tipos_disponibles::CUARTO_DE_MILLA || numero_ingresado > tipos_disponibles::CRONO) {
+            std::cout << "ERROR: El número no está en la lista" << std::endl;
+            continue;
+        }
+        break;
+    }
+    tipo = numero_ingresado;
 }
 
-// TODO validar que no sea un string vacío
 void obtenerNombre(std::string &nombre) {
-    std::cout << "Ingrese nombre: "; std::cin >> nombre;
+    while (true) {
+        std::cout << "Ingrese nombre: "; std::cin >> nombre;
+        if (nombre.empty()) {
+            std::cout << "ERROR: Ingrese un nombre valido" << std::endl;
+            continue;
+        }
+        break;
+    }
 }
 
-void obtenerCaballos(const int &cantidad_caballos, std::vector<int> &tipos_ingresados, std::vector<std::string> &nombres_ingresados) {
-    for (int i = 0; i < cantidad_caballos; i++) {
+void obtenerCaballos(std::vector<Caballo> &caballos) {
+    for (int i = 0; i < caballos.size(); i++) {
         std::cout << "CABALLO NUMERO " << i+1 << std::endl;
-        obtenerTipo(tipos_ingresados[i]);
-        obtenerNombre(nombres_ingresados[i]);
+        obtenerTipo(caballos[i].tipo);
+        obtenerNombre(caballos[i].nombre);
     }
 }
 

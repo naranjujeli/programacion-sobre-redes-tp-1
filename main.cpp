@@ -1,11 +1,13 @@
 #include "stdafx.h" // Bibliotecas estándar de C++
 #include "tipos_disponibles.h" // Tipos de caballo en un enum (1 al 6)
+#include "Caballo.h" // Estructura que agrupa los datos de cada caballo
 #include "entrada_salida.h" // Funciones para tomar entrada del usuario o mostrar datos en la consola
 #include "utilidades_matematicas.h" // Funciones matemáticas agrupadas
+#include "utilidades_algoritmicas.h" // Funciones de ordenamiento y otras
 #include "caballos.h" // Procedimientos para calcular el tiempo de cada tipo caballo
 
 
-int calcularTiempo(const int &, const std::string &);
+void calcularTiempo(Caballo &);
 
 
 int main() {
@@ -16,20 +18,24 @@ int main() {
     int cantidad_caballos;
     obtenerCantidadCaballos(cantidad_caballos);
     // Tipo y nombre
-    std::vector<int> tipos_ingresados(cantidad_caballos);
-    std::vector<std::string> nombres_ingresados(cantidad_caballos);
-    obtenerCaballos(cantidad_caballos, tipos_ingresados, nombres_ingresados);
-
-    // waitpid()
+    std::vector<Caballo> caballos(cantidad_caballos);
+    obtenerCaballos(caballos);
 
     /*** Calcular tiempos ***/
-    std::vector<float> tiempo(cantidad_caballos);
     for (int i = 0; i < cantidad_caballos; i++) {
         reiniciarRandomSeed();
-        tiempo[i] = calcularTiempo(tipos_ingresados[i], nombres_ingresados[i]);
+        calcularTiempo(caballos[i]);
+    }
+
+    /*** Ordenar caballos y asignar puestos ***/
+    bubbleSort(caballos);
+    for (int i = 0; i < caballos.size(); i++) {
+        caballos[i].puesto = i+1;
     }
 
     /*** Mostrar resultados ***/
+    std::cout << "El ganador fue: " << caballos[0].nombre << " con " << caballos[0].tiempo << " segundos" << std::endl;
+    std::cout << "El último fue: " << (caballos.end()-1)->nombre << " con " << (caballos.end()-1)->tiempo << " segundos" << std::endl;
 
     /*** Guardar datos ***/
 
@@ -47,7 +53,7 @@ int main() {
     return 0;
 }
 
-int calcularTiempo(const int &tipo, const std::string &nombre) {
+void calcularTiempo(Caballo &caballo) {
     int arreglo_pipe[2];
     if (pipe(arreglo_pipe) == -1) {
         throw "Error al ejecutar la función pipe()";
@@ -60,7 +66,7 @@ int calcularTiempo(const int &tipo, const std::string &nombre) {
     
     if (pid == 0) {
         int tiempo;
-        switch (tipo) {
+        switch (caballo.tipo) {
             case tipos_disponibles::CUARTO_DE_MILLA:
                 tiempo = caballoCuartoDeMilla();
                 break;
@@ -84,13 +90,11 @@ int calcularTiempo(const int &tipo, const std::string &nombre) {
         write(arreglo_pipe[1], &tiempo, sizeof(int));
         close(arreglo_pipe[1]);
 
-        std::cout << nombre << " >> Terminé en " << tiempo << " segundos" << std::endl;
+        std::cout << caballo.nombre << " >> Terminé en " << tiempo << " segundos" << std::endl;
         exit(0);
     }
 
     wait(NULL);
 
-    int *tiempo;
-    read(arreglo_pipe[0], tiempo, sizeof(int));
-    return *tiempo;
+    read(arreglo_pipe[0], &caballo.tiempo, sizeof(int));
 }
