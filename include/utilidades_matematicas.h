@@ -7,6 +7,6 @@ void reiniciarRandomSeed();
 int enteroAleatorio(const int &, const int &);
 float flotanteAleatorio(const float &, const float &);
 int redondearHaciaArriba(const float &);
-float sacarPromedio(const std::vector<Caballo> &);
+float promedioTiemposCaballos(const std::vector<Caballo> &);
 
 #endif

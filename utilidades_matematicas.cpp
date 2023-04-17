@@ -13,7 +13,6 @@ int enteroAleatorio(const int &minimo, const int &maximo) {
     return rand() % maximo + minimo;
 }
 
-
 float flotanteAleatorio(const float &minimo, const float &maximo) {
     return (float)rand() / (float)RAND_MAX * (maximo-minimo) + minimo;
 }
@@ -22,7 +21,7 @@ int redondearHaciaArriba(const float &valor_flotante) {
     return std::ceil(valor_flotante);
 }
 
-float sacarPromedio(const std::vector<Caballo> &caballos) {
+float promedioTiemposCaballos(const std::vector<Caballo> &caballos) {
     int suma_tiempos = 0; 
     for (int i = 0; i < caballos.size(); i++) { 
         suma_tiempos += caballos[i].tiempo;

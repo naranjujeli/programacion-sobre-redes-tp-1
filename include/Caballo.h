@@ -6,8 +6,12 @@
 struct Caballo {
     std::string nombre;
     int tipo;
-    int tiempo;
+    int tiempo=0;
     int puesto;
+
+    Caballo(int tiempo=0) : tiempo(tiempo) {}
 };
+
+// Caballo::Caballo(int tiempo=0) : tiempo(tiempo);
 
 #endif
