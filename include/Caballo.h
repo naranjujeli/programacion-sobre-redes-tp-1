@@ -1,7 +1,7 @@
 #ifndef CABALLO_H
 #define CABALLO_H
 
-#include "stdafx.h"
+#include <stdafx.h>
 
 struct Caballo {
     std::string nombre;

@@ -1,10 +1,18 @@
 #ifndef ENTRADA_SALIDA_CPP
 #define ENTRADA_SALIDA_CPP
 
-#include "stdafx.h"
-#include "tipos_disponibles.h"
-#include "Caballo.h"
-#include "entrada_salida.h"
+#include <stdafx.h>
+#include <tipos_disponibles.h>
+#include <Caballo.h>
+#include <entrada_salida.h>
+
+void menuFinal() {
+    std::cout << "La carrera ha finalizado" << std::endl;
+    std::cout << "Ingrese un número para realizar las siguientes acciones" << std::endl;
+    std::cout << "1. Volver a simular carrera" << std::endl;
+    std::cout << "2. Informacion caballo" << std::endl;
+    std::cout << "3. Salir" << std::endl;
+}
 
 void obtenerCantidadCaballos(int &cantidad_caballos) {
     std::cout << "Ingrese la cantidad de caballos: "; std::cin >> cantidad_caballos;

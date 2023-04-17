@@ -1,11 +1,10 @@
-#include "stdafx.h" // Bibliotecas estándar de C++
-#include "tipos_disponibles.h" // Tipos de caballo en un enum (1 al 6)
-#include "Caballo.h" // Estructura que agrupa los datos de cada caballo
-#include "entrada_salida.h" // Funciones para tomar entrada del usuario o mostrar datos en la consola
-#include "utilidades_matematicas.h" // Funciones matemáticas agrupadas
-#include "utilidades_algoritmicas.h" // Funciones de ordenamiento y otras
-#include "caballos.h" // Procedimientos para calcular el tiempo de cada tipo caballo
-
+#include <stdafx.h> // Bibliotecas estándar de C++
+#include <tipos_disponibles.h> // Tipos de caballo en un enum (1 al 6)
+#include <Caballo.h> // Estructura que agrupa los datos de cada caballo
+#include <entrada_salida.h> // Funciones para tomar entrada del usuario o mostrar datos en la consola
+#include <utilidades_matematicas.h> // Funciones matemáticas agrupadas
+#include <utilidades_algoritmicas.h> // Funciones de ordenamiento y otras
+#include <caballos.h> // Procedimientos para calcular el tiempo de cada tipo caballo
 
 void calcularTiempo(Caballo &);
 
@@ -13,6 +12,8 @@ void calcularTiempo(Caballo &);
 int main() {
     // TODO Abarcar varias carreras
 
+    std::vector<std::pair<Caballo, Caballo>> ganadores_perdedores;
+    
     /*** Tomar entrada del usuario ***/
     // Cantidad de caballos
     int cantidad_caballos;
@@ -33,23 +34,13 @@ int main() {
         caballos[i].puesto = i+1;
     }
 
-    /*** Mostrar resultados ***/
-    std::cout << "El ganador fue: " << caballos[0].nombre << " con " << caballos[0].tiempo << " segundos" << std::endl;
-    std::cout << "El último fue: " << (caballos.end()-1)->nombre << " con " << (caballos.end()-1)->tiempo << " segundos" << std::endl;
-
     /*** Guardar datos ***/
+    ganadores_perdedores.push_back(std::make_pair(caballos[0], *(caballos.end()-1)));
 
-
-    // Debugging
-    /* 
-    std::cout << "Caballo cuarto de milla: " << caballoCuartoDeMilla() << std::endl;
-    std::cout << "Caballo rayo: " << caballoRayo() << std::endl;
-    std::cout << "Caballo lineal: " << caballoLineal() << std::endl;
-    std::cout << "Caballo exponencial: " << caballoExponencial() << std::endl;
-    std::cout << "Duoballo: " << caballoDuoballo() << std::endl;
-    std::cout << "Crono caballo: " << caballoCrono() << std::endl;
-    */
-
+    /*** Mostrar resultados ***/
+    std::cout << "El ganador de la carrera fue: " << (ganadores_perdedores.end()-1)->first.nombre << std::endl;
+    std::cout << "El último de la carrera fue: " << (ganadores_perdedores.end()-1)->second.nombre << std::endl;
+    
     return 0;
 }
 

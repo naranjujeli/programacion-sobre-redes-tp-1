@@ -1,10 +1,10 @@
 #ifndef CABALLOS_CPP
 #define CABALLOS_CPP
 
-#include "stdafx.h"
-#include "utilidades_matematicas.h"
-#include "Caballo.h"
-#include "caballos.h"
+#include <stdafx.h>
+#include <utilidades_matematicas.h>
+#include <Caballo.h>
+#include <caballos.h>
 
 int caballoCuartoDeMilla() {
     int tiempo_total = 0;
