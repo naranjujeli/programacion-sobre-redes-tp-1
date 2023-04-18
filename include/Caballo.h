@@ -12,6 +12,4 @@ struct Caballo {
     Caballo(int tiempo=0) : tiempo(tiempo) {}
 };
 
-// Caballo::Caballo(int tiempo=0) : tiempo(tiempo);
-
 #endif

@@ -8,14 +8,11 @@
 
 void calcularTiempo(Caballo &);
 
-
 int main() {
     Caballo mejor_caballo(INT32_MAX), peor_caballo(INT32_MIN);
 
     int opcion_ingresada = 0;
     do {
-
-
         /*** Tomar entrada del usuario ***/
         // No se vuelven a pedir los datos al usuario si se quiere volver a simular la misma carrera
         // Cantidad de caballos
@@ -60,7 +57,7 @@ int main() {
                     break;
                 case 3:
                     // Promedio tiempos 
-                    mostrarPromedioTodosLosCaballos(caballos);
+                    mostrarPromedioTodosCaballos(caballos);
                     break;
                 case 4:
                     // Ver mejor y peor
@@ -77,16 +74,19 @@ int main() {
 }
 
 void calcularTiempo(Caballo &caballo) {
+    // Definir arreglo para la comunicación con pipe()
     int arreglo_pipe[2];
     if (pipe(arreglo_pipe) == -1) {
         throw "🛑 ERROR al ejecutar la función pipe()";
     }
 
+    // Crear un nuevo proceso hijo con fork()
     int pid = fork();
     if (pid == -1) {
         throw "🛑 ERROR al ejecutar la función fork()";
     }
     
+    // Calcular el tiempo con el procedimiento que corresponda según el caballo
     if (pid == 0) {
         int tiempo;
         switch (caballo.tipo) {
@@ -110,6 +110,7 @@ void calcularTiempo(Caballo &caballo) {
                 break;
         }
 
+        // Pasar el tiempo al proceso padre con pipe()
         write(arreglo_pipe[1], &tiempo, sizeof(int));
         close(arreglo_pipe[1]);
 
@@ -119,5 +120,6 @@ void calcularTiempo(Caballo &caballo) {
 
     wait(NULL);
 
+    // Leer el tiempo calculado por el proceso hijo
     read(arreglo_pipe[0], &caballo.tiempo, sizeof(int));
 }

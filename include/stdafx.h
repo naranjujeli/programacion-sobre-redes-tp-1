@@ -1,3 +1,7 @@
+/*
+    Todas estas bibliotecas son nativas de C/C++
+*/
+
 #ifndef STDAFX_H
 #define STDAFX_H
 

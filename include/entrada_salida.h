@@ -1,3 +1,9 @@
+/*
+    En este archivo de ven declaradas todas las
+    funciones relacionadas con la entrada y la
+    salida estándar por consola.
+*/
+
 #ifndef ENTRADA_SALIDA_H
 #define ENTRADA_SALIDA_H
 
